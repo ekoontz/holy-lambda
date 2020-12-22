@@ -1,18 +1,16 @@
 # Prerequisites
 
-- aws
-- sam
+- `aws`
+- `sam`
+
+## Additional prerequisites needed from running Lambdas locally
+
+- Docker (used by `sam` to host the Lambda environment)
 
 ## Additional prerequisites for building native lambdas
 
-### Mac OS or Windows
-
-- Docker
-
-### Linux
-
-- graalvm (including `native-image`) : run 'make install-graalvm' two levels up.
-
+- Docker (on non-Linux build machines)
+- graalvm (on Linux build machines): run 'make install-graalvm' two levels up.
 
 # Deploy a locally-hosted Lambda
 
