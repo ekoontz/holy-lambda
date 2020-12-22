@@ -12,10 +12,10 @@ PWD=$$(pwd)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	native_image_cmd=native-image -jar target/output.jar --report-unsupported-elements-at-runtime -H:ConfigurationFileDirectories=resources/native-configuration --no-fallback --enable-url-protocols=http,https --no-server  --initialize-at-build-time
+	native_image_cmd=native-image -jar target/output.jar --report-unsupported-elements-at-runtime --no-fallback --enable-url-protocols=http,https --no-server  --initialize-at-build-time
 	DRY_API_WARNING=""
 else
-	native_image_cmd=docker run -v ${PWD}:/project:Z -it fierycod/graalvm-native-image:latest bash -c "cd /project && native-image -jar target/output.jar --report-unsupported-elements-at-runtime -H:ConfigurationFileDirectories=resources/native-configuration --no-fallback --enable-url-protocols=http,https --no-server  --initialize-at-build-time "
+	native_image_cmd=docker run -v ${PWD}:/project:Z -it fierycod/graalvm-native-image:latest bash -c "cd /project && native-image -jar target/output.jar --report-unsupported-elements-at-runtime --no-fallback --enable-url-protocols=http,https --no-server  --initialize-at-build-time "
 	DRY_API_WARNING="'dry-api' does not work on your platform: use 'native-dry-api' instead to run within Docker."
 endif
 
