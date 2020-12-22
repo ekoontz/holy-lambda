@@ -1,5 +1,5 @@
 install-graalvm:
-	@wget -O graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java8-linux-amd64-20.3.0.tar.gz
+	@wget -O graalvm.tar.gz https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.3.0/graalvm-ce-java11-linux-amd64-20.3.0.tar.gz
 	@mkdir -p .graalvm && tar xvzf graalvm.tar.gz -C .graalvm --strip-components 1
 	@mv .graalvm/ ~/.graalvm
 	if [ ${NATIVE_INSTALL} != "" ]; then bash -c ${NATIVE_INSTALL}; fi
