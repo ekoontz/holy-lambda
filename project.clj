@@ -1,4 +1,4 @@
-(defproject fierycod/holy-lambda "0.0.7-SNAPSHOT"
+(defproject fierycod/holy-lambda "0.0.8"
   :description "Micro framework which turns your code into AWS Lambda functions"
 
   :url "https://github.com/FieryCod/holy-lambda"
@@ -28,7 +28,4 @@
         :url "https://github.com/FieryCod/holy-lambda"}
 
   :profiles {:eftest {:global-vars {*warn-on-reflection* false}
-                      :plugins [[lein-eftest "0.5.8"]]}
-             :uberjar {:aot :all
-                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"
-                                  "-Dclojure.spec.skip-macros=true"]}})
+                      :plugins [[lein-eftest "0.5.8"]]}})

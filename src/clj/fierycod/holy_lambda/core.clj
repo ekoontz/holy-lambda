@@ -13,7 +13,6 @@
    [fierycod.holy-lambda.impl.agent]
    [fierycod.holy-lambda.impl.util :as u]
    [clojure.data.json :as json]
-   [clojure.walk :as w]
    [clojure.tools.macro :as macro])
   (:import
    [java.io InputStream OutputStream InputStreamReader]
@@ -87,10 +86,6 @@
    (cond-> (get headers prop)
      (seq (get headers prop)) first)))
 
-(defn- keywordize-hashmap
-  [m]
-  (w/keywordize-keys (into {} m)))
-
 (defn- ctx
   [envs rem-time fn-name fn-version fn-invoked-arn memory-limit
    aws-request-id log-group-name log-stream-name
@@ -122,8 +117,8 @@
                      :appVersionName (.getAppVersionName client)
                      :appVersionCode (.getAppVersionCode client)
                      :appPackageName (.getAppPackageName client)})
-          :custom (keywordize-hashmap (.getCustom client-context))
-          :environment (keywordize-hashmap (.getEnvironment client-context))})
+          :custom (into {} (.getCustom client-context))
+          :environment (into {} (.getEnvironment client-context))})
        (.getLogger context)))
 
 (defn- define-synthetic-name
@@ -133,7 +128,7 @@
 
 (defn- envs
   []
-  (keywordize-hashmap (System/getenv)))
+  (into {} (System/getenv)))
 
 (defn- wrap-lambda
   [gmethod-sym fn-args fn-body gclass]
@@ -188,12 +183,12 @@
               ":function:" (get-env :AWS_LAMBDA_FUNCTION_NAME))
          (get-env :AWS_LAMBDA_FUNCTION_MEMORY_SIZE)
          ;; TODO: Incorrect requestId
-         (-> event :requestContext :requestId)
+         (get-in event [:requestContext :requestId])
          (get-env :AWS_LAMBDA_LOG_GROUP_NAME)
          (get-env :AWS_LAMBDA_LOG_STREAM_NAME)
          ;; #8
          {:identityId "????"
-          :identityPoolId (-> event :requestContext :identity :cognitoIdentityPoolId)}
+          :identityPoolId (get-in event [:requestContext :identity :cognitoIdentityPoolId])}
          ;; #7
          {:client nil :custom nil :environment nil}
          #'fierycod.holy-lambda.impl.logging/*logger*)))
@@ -203,7 +198,7 @@
   (let [exit! #(System/exit -1)
         url (str "http://" *runtime* "/2018-06-01/runtime/invocation/" *invocation-id* "/error")
         payload {:errorMessage (.getMessage err)
-                 :errorType (-> err (.getClass) (.getCanonicalName))}
+                 :errorType (.getCanonicalName (.getClass err))}
         response (u/http "POST" url payload)]
     (error (.getMessage err))
     (when-not (u/success-code? (:status response))
@@ -225,7 +220,7 @@
 
 (defn- process-event
   [aws-event env-vars handler]
-  (let [event (-> aws-event :body)
+  (let [event (:body aws-event)
         context (native->aws-context (:headers aws-event) event env-vars)]
     (try
       (send-response (handler event context))
